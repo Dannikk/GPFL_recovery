@@ -3,6 +3,7 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui.hpp>
 #include "Image4CGP.h"
+#include "EdgeDetection.h"
 #include <filesystem>
 
 #include <bits/stdc++.h>
@@ -38,14 +39,14 @@ int recovering(struct parameters* params, const string& path2srcimages,
     string file_name;
     regex regexp("[0-9]+");
     smatch m;
-
+    chromos_pairs.reserve(extIterNum);
     for (const auto & entry: fs::directory_iterator(path2chromos)) {
+//        cout << "chromos_pairs.size(): " << chromos_pairs.size()<< "; chromos_pairs.capacity(): " << chromos_pairs.capacity() << endl;
         file_name = entry.path().string();
         fname = strcpy((char*)malloc(file_name.length()+1), file_name.c_str());
         regex_search(file_name, m, regexp);
         chromo = initialiseChromosomeFromFile(fname, numImages);
-        chromos_pairs.push_back(make_pair(stoi(m[0]), chromo));
-        chromos.push_back(chromo);
+        chromos_pairs.emplace_back(stoi(m[0]), chromo);
         delete [] fname;
     }
 
@@ -85,8 +86,15 @@ int recovering(struct parameters* params, const string& path2srcimages,
     int infinite_pred_statistics = 0;
     int infinite_common_statistics = 0;
 
-    for (int ei = 0; ei<extIterNum; ei++){
-        if (ei % 50 == 0)
+    FILE *fp = fopen("../coeffs.txt", "w");
+
+    for (int i=0; i < numImages; i++) {
+        fprintf(fp, "%s\t\t\t\t", file_names[i].c_str());
+    }
+    fprintf(fp, "\n");
+
+    for (int ei = 0; ei<extIterNum; ei++) {
+        if (ei % 100 == 0)
             cout << "Iteration: " << ei << endl;
         chromo = chromos_pairs[ei].second;
 
@@ -114,7 +122,7 @@ int recovering(struct parameters* params, const string& path2srcimages,
             cout << "Any problems with variancePred: \n\tvariancePred=" << variancePred
             << "; meanPred2=" << meanPred2 << "; meanPred=" << meanPred << endl;
             cout << "But: \n\tmp_trash=" << mp_trash << "; mp2_trash=" << mp2_trash << endl;
-            infinite_pred_statistics += 1;
+            infinite_pred_statistics++;
             continue;
         }
 
@@ -123,7 +131,7 @@ int recovering(struct parameters* params, const string& path2srcimages,
             meanImage2 = 0;
             meanImagePred = 0;
 
-//            #pragma omp parallel for default(none), shared(meanImage,meanImage2,meanImagePred,i,numRes,imagePred,data,params), schedule(dynamic), num_threads(getNumThreads(params))
+            #pragma omp parallel for default(none), shared(meanImage,meanImage2,meanImagePred,i,numRes,imagePred,data,params), schedule(dynamic), num_threads(getNumThreads(params))
             for (int p=0; p<numRes; p++) {
                 double pixel = getDataSetSampleOutput(data, i*numRes + p, 0);
                 meanImage += pixel;
@@ -139,6 +147,7 @@ int recovering(struct parameters* params, const string& path2srcimages,
                 cout << "Oops!:\n\t" << "variancePred=" << variancePred << "; covariance=" << covariance << "; covariance / variancePred=" << covariance / variancePred << endl;
                 setA(chromo, i, 0);
                 setB(chromo, i, 0);
+                infinite_common_statistics++;
 //                break;
             } else {
                 // save A and B coefficients (linear scaling)
@@ -151,7 +160,7 @@ int recovering(struct parameters* params, const string& path2srcimages,
             a = getA(chromo, i);
             b = getB(chromo, i);
 
-//            #pragma omp parallel for default(none), shared(recovered_pixel,a,b,i,numRes,imagePred,data,outputs,recovered,imageArray), schedule(dynamic), num_threads(getNumThreads(params))
+            #pragma omp parallel for default(none), shared(recovered_pixel,a,b,i,numRes,imagePred,data,outputs,recovered,imageArray), schedule(dynamic), num_threads(getNumThreads(params))
             for (int p=0; p<numRes; p++) {
                 recovered_pixel = a + b*imagePred[p];
                 outputs[i * numRes + p] = getDataSetSampleOutput(data, i*numRes + p,0) - recovered_pixel;
@@ -159,17 +168,27 @@ int recovering(struct parameters* params, const string& path2srcimages,
                 imageArray[p] = recovered[i * numRes + p];
             }
 
-            if (ei > 0 and ei % 1000 == 0) {
-                cv::Mat greyImg = cv::Mat(height, width, CV_64F, imageArray);
-                std::string greyArrWindow = String("Image") + to_string(i);
-                cv::namedWindow(greyArrWindow, cv::WINDOW_NORMAL);
-                cv::imshow(greyArrWindow, greyImg);
-                waitKey(0);
+            if (show_new_pictures) {
+                if (ei > 0 and ei % 1000 == 0) {
+                    cv::Mat greyImg = cv::Mat(height, width, CV_64F, imageArray);
+                    std::string greyArrWindow = String("Image") + to_string(i);
+                    cv::namedWindow(greyArrWindow, cv::WINDOW_NORMAL);
+                    cv::imshow(greyArrWindow, greyImg);
+                    waitKey(0);
+                }
             }
         }
+
+        for (int i=0; i < numImages; i++) {
+            fprintf(fp, "%.15E %.15E\t", getA(chromo, i), getB(chromo, i));
+        }
+        fprintf(fp, "\n");
+
         freeDataSet(data);
         data = initialiseDataSetFromArrays(2, 1, numImages * numRes, inputs, outputs);
     }
+
+    fclose(fp);
 
     for (int i = 0; i < numImages; i++) {
         for (int p=0; p < numRes; p++) {
@@ -194,6 +213,43 @@ int recovering(struct parameters* params, const string& path2srcimages,
 
     cout << "infinite_pred_statistics: " << infinite_pred_statistics << endl;
     cout << "infinite_common_statistics: " << infinite_common_statistics << endl;
+
+    auto** edges = new double*[numImages];
+    auto* gradients = new double[numImages];
+
+    for(int i=0; i < numImages; i++) {
+        edges[i] = new double[width * height];
+    }
+
+    chromos.reserve(extIterNum);
+    for(int ei=0; ei<extIterNum; ei++) {
+        chromos.push_back(chromos_pairs[ei].second);
+    }
+
+    cout << "chromos.size(): " << chromos.size()<< "chromos.capacity()" << chromos.capacity() << endl;
+
+    const double epsilon = pow(10, -9);
+
+    for(int x=0; x<width; x++) {
+        for (int y=0; y<height; y++) {
+            gradient_module(x, y, gradients, extIterNum, params, chromos, epsilon);
+            for(int i=0; i<numImages; i++){
+                edges[i][x + y*width] = gradients[i];
+            }
+        }
+    }
+
+    prefix = string("edge_");
+
+    for (int i = 0; i < numImages; i++) {
+        cv::Mat greyImg = cv::Mat(height, width, CV_64F, edges[i]);
+        name = string("../EdgeDetection/") + prefix + file_names[i] + ".png";
+        imwrite(name, greyImg);
+
+        greyImg *= 255.0;
+        name = string("../EdgeDetection/") + prefix + string("255") + file_names[i] + ".png";
+        imwrite(name, greyImg);
+    }
 
     return 0;
 }
@@ -220,7 +276,7 @@ int main() {
     setImageResolution(params, width*height);
     setWidth(params, width);
     setHeight(params, height);
-    setNumThreads(params, 4);
+    setNumThreads(params, numThreads);
 
     recovering(params, path2srcimages, path2chromos, ext_iterNum, false, true);
 

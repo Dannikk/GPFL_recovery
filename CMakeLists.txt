@@ -11,7 +11,7 @@ find_package( OpenCV REQUIRED )
 find_package(Boost 1.40 COMPONENTS program_options REQUIRED)
 include_directories( ${OpenCV_INCLUDE_DIRS} )
 
-add_executable(GPFL_recovery main.cpp cgp.c Image4CGP.cpp)
+add_executable(GPFL_recovery main.cpp cgp.c Image4CGP.cpp EdgeDetection.cpp EdgeDetection.h)
 
 #target_link_libraries( GPFL_recovery ${OpenCV_LIBS} OpenMP::OpenMP_CXX)
 

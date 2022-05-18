@@ -1,0 +1,12 @@
+numInputs,2
+numNodes,2
+numOutputs,1
+arity,2
+functionSet,add,sub,mul,div,sq,sqrt,tanh,1,0,wire,sin,cos,min,max
+9
+0,0.392158
+1,-0.562977
+10
+2,-0.736513
+2,0.421601
+3,
