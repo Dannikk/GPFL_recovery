@@ -1,0 +1,22 @@
+[
+{
+  "directory": "C:/Users/nikit/CLionProjects/GPFL_recovery/build",
+  "command": "C:/msys64/mingw64/bin/g++.exe -DNO_DLL @CMakeFiles/GPFL_recovery.dir/includes_CXX.rsp  -fopenmp -g -fopenmp -std=gnu++17 -o CMakeFiles/GPFL_recovery.dir/main.cpp.obj -c C:/Users/nikit/CLionProjects/GPFL_recovery/main.cpp",
+  "file": "C:/Users/nikit/CLionProjects/GPFL_recovery/main.cpp"
+},
+{
+  "directory": "C:/Users/nikit/CLionProjects/GPFL_recovery/build",
+  "command": "C:/msys64/mingw64/bin/gcc.exe -DNO_DLL @CMakeFiles/GPFL_recovery.dir/includes_C.rsp  -fopenmp -g -o CMakeFiles/GPFL_recovery.dir/cgp.c.obj -c C:/Users/nikit/CLionProjects/GPFL_recovery/cgp.c",
+  "file": "C:/Users/nikit/CLionProjects/GPFL_recovery/cgp.c"
+},
+{
+  "directory": "C:/Users/nikit/CLionProjects/GPFL_recovery/build",
+  "command": "C:/msys64/mingw64/bin/g++.exe -DNO_DLL @CMakeFiles/GPFL_recovery.dir/includes_CXX.rsp  -fopenmp -g -fopenmp -std=gnu++17 -o CMakeFiles/GPFL_recovery.dir/Image4CGP.cpp.obj -c C:/Users/nikit/CLionProjects/GPFL_recovery/Image4CGP.cpp",
+  "file": "C:/Users/nikit/CLionProjects/GPFL_recovery/Image4CGP.cpp"
+},
+{
+  "directory": "C:/Users/nikit/CLionProjects/GPFL_recovery/build",
+  "command": "C:/msys64/mingw64/bin/g++.exe -DNO_DLL @CMakeFiles/GPFL_recovery.dir/includes_CXX.rsp  -fopenmp -g -fopenmp -std=gnu++17 -o CMakeFiles/GPFL_recovery.dir/EdgeDetection.cpp.obj -c C:/Users/nikit/CLionProjects/GPFL_recovery/EdgeDetection.cpp",
+  "file": "C:/Users/nikit/CLionProjects/GPFL_recovery/EdgeDetection.cpp"
+}
+]

@@ -12,7 +12,7 @@ using namespace std;
 
 
 void gradient_module(int x, int y, double* gradients, int numExtIter,
-                     struct parameters* params, vector<struct chromosome*> chromos, double epsilon);
+                     struct parameters* params, vector<struct chromosome*> chromos, double epsilon, bool print_points);
 
 
 #endif //GPFL_RECOVERY_EDGEDETECTION_H

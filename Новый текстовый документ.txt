@@ -1,0 +1,8 @@
+On iteration 141
+On iteration 825
+On iteration 1038
+On iteration 1714
+On iteration 2378
+On iteration 3892
+On iteration 4845
+On iteration 5066

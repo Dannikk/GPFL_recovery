@@ -1043,7 +1043,7 @@ DLL_EXPORT void printChromosome(struct chromosome *chromo, int weights);
 			<getChromosomeOutput>
 
 */
-DLL_EXPORT void executeChromosome(struct chromosome *chromo, const double *inputs);
+DLL_EXPORT double executeChromosome(struct chromosome *chromo, const double *inputs);
 
 
 

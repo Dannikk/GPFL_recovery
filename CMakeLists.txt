@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 project(GPFL_recovery)
 
-#set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 add_definitions(-DNO_DLL)
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c99 -fopenmp")

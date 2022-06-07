@@ -101,6 +101,13 @@ struct dataSet* loadDataSetFromImages(const string& sourcePath, vector<string>& 
     dataSet2return = initialiseDataSetFromArrays(2, 1, numImages * numRes, inputs, outputs);
     cout << "Recording finished!" << endl;
 
+    /*cout << "lets see what in dataset: " << endl;
+    for (int i=0; i < 200; i++){
+        double *inputss;
+        inputss = getDataSetSampleInputs(dataSet2return, i);
+        cout << inputss[0] << "; " << inputss[1] << "=" << getDataSetSampleOutput(dataSet2return, i, 0) << endl;
+    }*/
+
     delete[] inputs;
     delete[] outputs;
 

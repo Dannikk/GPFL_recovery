@@ -944,8 +944,8 @@ DLL_EXPORT struct chromosome *initialiseChromosome(struct parameters *params) {
 
     // added by: DNA
 
-    chromo->a = (double*)malloc(sizeof(double)*getNumImages(params));
-    chromo->b = (double*)malloc(sizeof(double)*getNumImages(params));
+    chromo->a = (double*)calloc(getNumImages(params),sizeof(double));
+    chromo->b = (double*)calloc(getNumImages(params), sizeof(double));
     chromo->numImages = getNumImages(params);
 
     //
@@ -1141,12 +1141,14 @@ DLL_EXPORT struct chromosome *initialiseChromosomeFromChromosome(struct chromoso
 
     // added by: DNA
 
-    printf("initialiseChromosomeFromChromosome");
-	/*chromoNew->a = (double*)malloc(sizeof(double)*getNumImages(params));
-	chromoNew->b = (double*)malloc(sizeof(double)*getNumImages(params));*/
+//    printf("initialiseChromosomeFromChromosome");
+	chromoNew->a = (double*)malloc(sizeof(double)*chromo->numImages);
+	chromoNew->b = (double*)malloc(sizeof(double)*chromo->numImages);
 
-    chromoNew->a = chromo->a;
-    chromoNew->b = chromo->b;
+    for(i=0; i<chromo->numImages; i++){
+        chromoNew->a[i] = chromo->a[i];
+        chromoNew->b[i] = chromo->b[i];
+    }
 
     //
 
@@ -1254,7 +1256,7 @@ DLL_EXPORT void printChromosome(struct chromosome *chromo, int weights) {
 /*
 	Executes the given chromosome
 */
-DLL_EXPORT void executeChromosome(struct chromosome *chromo, const double *inputs) {
+DLL_EXPORT double executeChromosome(struct chromosome *chromo, const double *inputs) {
 
 	int i, j;
 	int nodeInputLocation;
@@ -1329,6 +1331,15 @@ DLL_EXPORT void executeChromosome(struct chromosome *chromo, const double *input
 			chromo->outputValues[i] = chromo->nodes[chromo->outputNodes[i] - numInputs]->output;
 		}
 	}
+
+    // added by: Dannik
+    if (chromo->outputNodes[0] < numInputs) {
+        return inputs[chromo->outputNodes[0]];
+    }
+    else {
+        return chromo->nodes[chromo->outputNodes[0] - numInputs]->output;
+    }
+
 }
 
 /*
