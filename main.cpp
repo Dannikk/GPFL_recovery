@@ -417,13 +417,13 @@ int recovering(struct parameters* params, const string& path2srcimages,
 
 
 int main() {
-    const int ext_iterNum = 10000;
+    const int ext_iterNum = 6000;
     const int width = 256;
     const int height = 256;
     const int numImages = 5;
     const int numThreads = 4;
     string path2srcimages = string("../images2gpfl_256");
-    string path2chromos = string("../Chromosomes");
+    string path2chromos = string("../Chromosomes_6000");
 
     /*cout << "creating circle" << endl;
     auto* ccc = new double[width*height];

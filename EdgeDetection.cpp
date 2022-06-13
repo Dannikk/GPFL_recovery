@@ -47,7 +47,7 @@ void gradient_module(int x, int y, double* gradients, int numExtIter,
         f_right_y[i]=0;
     }
 
-    for(int ei=500; ei < numExtIter; ei++) {
+    for(int ei=250; ei < numExtIter; ei++) {
         executeChromosome(chromos[ei], lx);
         f_lx = getChromosomeOutput(chromos[ei],0);
         executeChromosome(chromos[ei], rx);
